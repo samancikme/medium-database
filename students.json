@@ -1,0 +1,44 @@
+{
+  "students": [
+    {
+      "firstname": "Markss",
+      "lastname": "John",
+      "image": "https://t3.ftcdn.net/jpg/01/02/95/20/360_F_102952057_2R01vWUYGKO8hWDtNhSzUtam08EdrYxk.jpg",
+      "email": "Marks2@gmail.com",
+      "phoneNumber": "998934562176",
+      "id": "1"
+    },
+    {
+      "id": "2",
+      "image": "https://t3.ftcdn.net/jpg/01/93/56/24/360_F_193562494_uZu3hswS738ZiuypuRl2oID4gM7mmAHX.jpghttps://t3.ftcdn.net/jpg/01/78/60/12/360_F_178601298_AbZq48t6u9k8bV7RSG8YrKuj7QxAGlhH.jpg",
+      "firstname": "John",
+      "lastname": "Doe",
+      "email": "johnbds2@gmail.com",
+      "phoneNumber": "998943024567"
+    },
+    {
+      "id": "3",
+      "image": "https://t3.ftcdn.net/jpg/01/02/95/20/360_F_102952057_2R01vWUYGKO8hWDtNhSzUtam08EdrYxk.jpg",
+      "firstname": "Mark",
+      "lastname": "Johnson",
+      "email": "Marks2@gmail.com",
+      "phoneNumber": "998934562176"
+    },
+    {
+      "id": "4",
+      "image": "https://previews.123rf.com/images/dimarik16/dimarik161803/dimarik16180300164/97377602-passport-portrait-of-young-caucasian-man-isolated-on-white-background.jpg",
+      "firstname": "Rick",
+      "lastname": "Novak",
+      "email": "johnbds2@gmail.com",
+      "phoneNumber": "998935627162"
+    },
+    {
+      "id": "5",
+      "image": "https://previews.123rf.com/images/leungchopan/leungchopan1406/leungchopan140600111/28915430-caucasian-man-headshot.jpg",
+      "firstname": "Ronald",
+      "lastname": "Bar",
+      "email": "ronaldbar2@gmail.com",
+      "phoneNumber": "9989353337162"
+    }
+  ]
+}
