@@ -15,23 +15,23 @@ app.use(bodyParser.json());
 const SECRET_KEY = "your_secret_key";
 
 // JSON fayldan foydalanuvchi ma'lumotlarini olish
-function getUsers() {
+function getAuthors() {
   const data = fs.readFileSync("./authors.json");
-  return JSON.parse(data).users;
+  return JSON.parse(data).authors;
 }
 
 // JSON faylga foydalanuvchi ma'lumotlarini yozish
-function saveUsers(users) {
-  fs.writeFileSync("./authors.json", JSON.stringify({ users }, null, 2));
+function saveUsers(authors) {
+  fs.writeFileSync("./authors.json", JSON.stringify({ authors }, null, 2));
 }
 
 // Register endpoint
 app.post("/register", (req, res) => {
   const { username, email, password } = req.body;
-  const users = getUsers();
+  const authors = getAuthors();
 
   // Email allaqachon mavjudligini tekshirish
-  if (users.some((user) => user.email === email)) {
+  if (authors.some((user) => user.email === email)) {
     return res.status(400).json({ message: "Email already exists" });
   }
 
@@ -39,14 +39,14 @@ app.post("/register", (req, res) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const newUser = {
-    id: users.length + 1,
+    id: authors.length + 1,
     username,
     email,
     password: hashedPassword,
   };
 
-  users.push(newUser);
-  saveUsers(users);
+  authors.push(newUser);
+  saveUsers(authors);
 
   res.status(201).json({ message: "User registered successfully" });
 });
@@ -54,9 +54,9 @@ app.post("/register", (req, res) => {
 // Login endpoint
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const users = getUsers();
+  const authors = getAuthors();
 
-  const user = users.find((user) => user.email === email);
+  const user = authors.find((user) => user.email === email);
   if (!user) {
     return res.status(400).json({ message: "Invalid email or password" });
   }
@@ -86,21 +86,21 @@ function authenticateToken(req, res, next) {
 }
 
 // JSON fayldan student ma'lumotlarini olish
-function getStudents() {
+function getPosts() {
   const data = fs.readFileSync("./posts.json");
-  return JSON.parse(data).students;
+  return JSON.parse(data).posts
 }
 
-// Get students endpoint (protected)
+// Get posts endpoint (protected)
 app.get("/posts", authenticateToken, (req, res) => {
-  const students = getStudents();
-  res.json(students);
+  const posts = getPosts();
+  res.json(posts);
 });
 
 // Get users endpoint (protected)
 app.get("/authors", authenticateToken, (req, res) => {
-  const users = getUsers();
-  res.json(users);
+  const authors = getAuthors();
+  res.json(authors);
 });
 
 app.listen(port, () => {
