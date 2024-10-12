@@ -92,13 +92,13 @@ function getStudents() {
 }
 
 // Get students endpoint (protected)
-app.get("/students", authenticateToken, (req, res) => {
+app.get("/posts", authenticateToken, (req, res) => {
   const students = getStudents();
   res.json(students);
 });
 
 // Get users endpoint (protected)
-app.get("/users", authenticateToken, (req, res) => {
+app.get("/authors", authenticateToken, (req, res) => {
   const users = getUsers();
   res.json(users);
 });
