@@ -16,13 +16,13 @@ const SECRET_KEY = "your_secret_key";
 
 // JSON fayldan foydalanuvchi ma'lumotlarini olish
 function getUsers() {
-  const data = fs.readFileSync("./users.json");
+  const data = fs.readFileSync("./authors.json");
   return JSON.parse(data).users;
 }
 
 // JSON faylga foydalanuvchi ma'lumotlarini yozish
 function saveUsers(users) {
-  fs.writeFileSync("./users.json", JSON.stringify({ users }, null, 2));
+  fs.writeFileSync("./authors.json", JSON.stringify({ users }, null, 2));
 }
 
 // Register endpoint
@@ -87,7 +87,7 @@ function authenticateToken(req, res, next) {
 
 // JSON fayldan student ma'lumotlarini olish
 function getStudents() {
-  const data = fs.readFileSync("./students.json");
+  const data = fs.readFileSync("./posts.json");
   return JSON.parse(data).students;
 }
 

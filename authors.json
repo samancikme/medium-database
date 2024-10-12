@@ -1,0 +1,44 @@
+[
+    {
+      "id": 1,
+      "fullName": "John Doe",
+      "avatar": "https://i.postimg.cc/0jKsXwWx/pexels-photo-2379005.jpg",
+      "job": "Frontend Developer",
+      "new": true
+    },
+    {
+      "id": 2,
+      "fullName": "Jane Smith",
+      "avatar": "https://i.postimg.cc/QdrwtkPR/cz-Nmcy1wcml2-YXRl-L3-Jhd3-Bpe-GVs-X2lt-YWdlcy93-ZWJza-XRl-X2-Nvbn-Rlbn-Qvb-HIvczkz-LXBh-LTU3-OTgtam9i-NTgz-Xz-Euan-Bn.webp",
+      "job": "Backend Developer",
+      "new": false
+    },
+    {
+      "id": 3,
+      "fullName": "Michael Brown",
+      "avatar": "https://i.postimg.cc/BZXdwvHw/portrait-smiling-young-man-looking-camera-33839-1731.avif",
+      "job": "Full Stack Developer",
+      "new": true
+    },
+    {
+      "id": 4,
+      "fullName": "Emily Johnson",
+      "avatar": "https://i.postimg.cc/5NzDbkPB/depositphotos-106932436-stock-photo-professional-woman-working.jpg",
+      "job": "UI/UX Designer",
+      "new": false
+    },
+    {
+      "id": 5,
+      "fullName": "David Wilson",
+      "avatar": "https://i.postimg.cc/DfHtVKcf/young-bearded-man-with-striped-shirt-273609-5677.avif",
+      "job": "DevOps Engineer",
+      "new": true
+    },
+    {
+      "id": 6,
+      "fullName": "Sarah Davis",
+      "avatar": "https://i.postimg.cc/7LhVY5xF/r53-Tb-BVk-400x400.jpg",
+      "job": "JavaScript Specialist",
+      "new": false
+    }
+  ]
