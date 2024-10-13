@@ -66,7 +66,7 @@ app.post("/register", (req, res) => {
   const users = getUsers();
 
   if (users.some((user) => user.email === email)) {
-    return res.status(400).json({ message: "Email already exists" });
+    return res.status(400).json({ message: "Email allaqachon mavjud" });
   }
 
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -80,7 +80,9 @@ app.post("/register", (req, res) => {
   users.push(newUser);
   saveUsers(users);
 
-  res.status(201).json({ message: "User registered successfully" });
+  res
+    .status(201)
+    .json({ message: "Foydalanuvchi muvaffaqiyatli ro'yxatdan o'tdi" });
 });
 
 // Login endpoint (foydalanuvchilarni autentifikatsiya qilish)
@@ -90,19 +92,19 @@ app.post("/login", (req, res) => {
 
   const user = users.find((user) => user.email === email);
   if (!user) {
-    return res.status(400).json({ message: "Invalid email or password" });
+    return res.status(400).json({ message: "Email yoki parol xato" });
   }
 
   const isPasswordValid = bcrypt.compareSync(password, user.password);
   if (!isPasswordValid) {
-    return res.status(400).json({ message: "Invalid email or password" });
+    return res.status(400).json({ message: "Email yoki parol xato" });
   }
 
   const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {
     expiresIn: "1h",
   });
 
-  res.status(200).json({ message: "Logged in successfully", token });
+  res.status(200).json({ message: "Kirish muvaffaqiyatli", token });
 });
 
 // Middleware for protected routes (only for authenticated users)
@@ -119,14 +121,14 @@ function authenticateToken(req, res, next) {
 
 // Foydalanuvchidan profil ma'lumotlarini olish (ismini va ishini so'rash)
 app.post("/profile", authenticateToken, (req, res) => {
-  const { name, job , image} = req.body;
+  const { fullName, job, image } = req.body;
   const authors = getAuthors();
 
   // Foydalanuvchini authors.json fayliga qo'shish
   const newAuthor = {
     id: authors.length + 1,
     userId: req.user.id,
-    name,
+    fullName,
     image,
     job,
   };
@@ -136,22 +138,22 @@ app.post("/profile", authenticateToken, (req, res) => {
 
   res
     .status(201)
-    .json({ message: "Profile updated successfully", author: newAuthor });
+    .json({ message: "Profil muvaffaqiyatli yangilandi", author: newAuthor });
 });
 
-// Public route: Get posts (accessible by everyone)
+// Public route: Get posts (hamma uchun ochiq)
 app.get("/posts", (req, res) => {
   const posts = getPosts();
   res.json(posts);
 });
 
-// Public route: Get authors (accessible by everyone)
+// Public route: Get authors (hamma uchun ochiq)
 app.get("/authors", (req, res) => {
   const authors = getAuthors();
   res.json(authors);
 });
 
-// Protected route: Create post (only for authenticated users)
+// Protected route: Create post (faqat autentifikatsiyadan o'tgan foydalanuvchilar uchun)
 app.post("/posts", authenticateToken, (req, res) => {
   const { title, content, image, excerpt } = req.body;
   const posts = getPosts();
@@ -165,15 +167,29 @@ app.post("/posts", authenticateToken, (req, res) => {
     image,
     excerpt,
     authorId: req.user.id,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date().setFullYear(),
   };
 
   posts.push(newPost);
   savePosts(posts);
 
-  res.status(201).json({ message: "Post created successfully", post: newPost });
+  res
+    .status(201)
+    .json({ message: "Post muvaffaqiyatli yaratildi", post: newPost });
+});
+
+// Protected route: Get profile (faqat autentifikatsiyadan o'tgan foydalanuvchilar uchun)
+app.get("/profile", authenticateToken, (req, res) => {
+  const authors = getAuthors();
+  const author = authors.find((author) => author.userId === req.user.id);
+
+  if (!author) {
+    return res.status(404).json({ message: "Profil topilmadi" });
+  }
+
+  res.status(200).json({ message: "Profil muvaffaqiyatli olingan", author });
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server ${port} portda ishlamoqda`);
 });
