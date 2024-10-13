@@ -36,6 +36,22 @@ function saveAuthors(authors) {
   fs.writeFileSync("./authors.json", JSON.stringify({ authors }, null, 2));
 }
 
+// JSON fayldan post ma'lumotlarini olish
+function getPosts() {
+  try {
+    const data = fs.readFileSync("./posts.json");
+    return JSON.parse(data).posts;
+  } catch (error) {
+    console.error("Error reading posts.json", error);
+    return [];
+  }
+}
+
+// JSON faylga post ma'lumotlarini yozish
+function savePosts(posts) {
+  fs.writeFileSync("./posts.json", JSON.stringify({ posts }, null, 2));
+}
+
 // Helper function to create a slug from title
 function createSlug(title) {
   return title
@@ -103,7 +119,7 @@ function authenticateToken(req, res, next) {
 
 // Foydalanuvchidan profil ma'lumotlarini olish (ismini va ishini so'rash)
 app.post("/profile", authenticateToken, (req, res) => {
-  const { name, job } = req.body;
+  const { name, job , image} = req.body;
   const authors = getAuthors();
 
   // Foydalanuvchini authors.json fayliga qo'shish
@@ -111,6 +127,7 @@ app.post("/profile", authenticateToken, (req, res) => {
     id: authors.length + 1,
     userId: req.user.id,
     name,
+    image,
     job,
   };
 
