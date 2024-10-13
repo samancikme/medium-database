@@ -38,7 +38,7 @@ function savePosts(posts) {
 
 // Register endpoint
 app.post("/register", (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password , job} = req.body;
   const authors = getAuthors();
 
   // Email allaqachon mavjudligini tekshirish
@@ -53,6 +53,7 @@ app.post("/register", (req, res) => {
     id: authors.length + 1,
     username,
     email,
+    job,
     password: hashedPassword,
   };
 
@@ -103,18 +104,31 @@ app.get("/posts", authenticateToken, (req, res) => {
 });
 
 // Create post endpoint (protected)
+// Helper function to create a slug from title
+function createSlug(title) {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
+}
+
+// Create post endpoint (protected)
 app.post("/posts", authenticateToken, (req, res) => {
-  const { title, content } = req.body;
+  const { title, content , excerpt , image} = req.body;
   const posts = getPosts();
+
+  // Yangi post uchun slug title dan yaratiladi
+  const slug = createSlug(title);
 
   // Yangi post yaratish
   const newPost = {
     id: posts.length + 1,
     title,
-    content,
-    excerpt,
     image,
-    authorId: req.user.id,  // Muallif foydalanuvchi IDsi bo'yicha belgilanadi
+    excerpt,
+    slug, // Slug backend tomonidan yaratiladi
+    content,
+    authorId: req.user.id,
     createdAt: new Date().toISOString(),
   };
 
