@@ -129,7 +129,7 @@ app.post("/posts", authenticateToken, (req, res) => {
     slug, // Slug backend tomonidan yaratiladi
     content,
     authorId: req.user.id,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date().setFullYear(),
   };
 
   posts.push(newPost);
