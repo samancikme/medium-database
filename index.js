@@ -25,20 +25,17 @@ function saveUsers(authors) {
   fs.writeFileSync("./authors.json", JSON.stringify({ authors }, null, 2));
 }
 
-// JSON fayldan post ma'lumotlarini olish
-function getPosts() {
-  const data = fs.readFileSync("./posts.json");
-  return JSON.parse(data).posts;
-}
-
-// JSON faylga post ma'lumotlarini yozish
-function savePosts(posts) {
-  fs.writeFileSync("./posts.json", JSON.stringify({ posts }, null, 2));
+// Helper function to create a slug from title
+function createSlug(title) {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
 }
 
 // Register endpoint
 app.post("/register", (req, res) => {
-  const { username, email, password , job} = req.body;
+  const { username, email, password } = req.body;
   const authors = getAuthors();
 
   // Email allaqachon mavjudligini tekshirish
@@ -53,7 +50,6 @@ app.post("/register", (req, res) => {
     id: authors.length + 1,
     username,
     email,
-    job,
     password: hashedPassword,
   };
 
@@ -85,7 +81,7 @@ app.post("/login", (req, res) => {
   res.status(200).json({ message: "Logged in successfully", token });
 });
 
-// Middleware for protected routes
+// Middleware for protected routes (only for creating posts)
 function authenticateToken(req, res, next) {
   const token = req.headers["authorization"];
   if (!token) return res.sendStatus(401);
@@ -97,24 +93,32 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Get posts endpoint (protected)
-app.get("/posts", authenticateToken, (req, res) => {
+// JSON fayldan post ma'lumotlarini olish
+function getPosts() {
+  const data = fs.readFileSync("./posts.json");
+  return JSON.parse(data).posts;
+}
+
+// JSON faylga post ma'lumotlarini yozish
+function savePosts(posts) {
+  fs.writeFileSync("./posts.json", JSON.stringify({ posts }, null, 2));
+}
+
+// Public route: Get posts (accessible by everyone)
+app.get("/posts", (req, res) => {
   const posts = getPosts();
   res.json(posts);
 });
 
-// Create post endpoint (protected)
-// Helper function to create a slug from title
-function createSlug(title) {
-  return title
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\-]/g, "");
-}
+// Public route: Get authors (accessible by everyone)
+app.get("/authors", (req, res) => {
+  const authors = getAuthors();
+  res.json(authors);
+});
 
-// Create post endpoint (protected)
+// Protected route: Create post (only for authenticated users)
 app.post("/posts", authenticateToken, (req, res) => {
-  const { title, content , excerpt , image} = req.body;
+  const { title, content } = req.body;
   const posts = getPosts();
 
   // Yangi post uchun slug title dan yaratiladi
@@ -136,12 +140,6 @@ app.post("/posts", authenticateToken, (req, res) => {
   savePosts(posts);
 
   res.status(201).json({ message: "Post created successfully", post: newPost });
-});
-
-// Get users endpoint (protected)
-app.get("/authors", authenticateToken, (req, res) => {
-  const authors = getAuthors();
-  res.json(authors);
 });
 
 app.listen(port, () => {
