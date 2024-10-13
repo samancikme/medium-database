@@ -15,13 +15,24 @@ app.use(bodyParser.json());
 const SECRET_KEY = "your_secret_key";
 
 // JSON fayldan foydalanuvchi ma'lumotlarini olish
+function getUsers() {
+  const data = fs.readFileSync("./users.json");
+  return JSON.parse(data).users;
+}
+
+// JSON faylga foydalanuvchi ma'lumotlarini yozish
+function saveUsers(users) {
+  fs.writeFileSync("./users.json", JSON.stringify({ users }, null, 2));
+}
+
+// JSON fayldan author ma'lumotlarini olish
 function getAuthors() {
   const data = fs.readFileSync("./authors.json");
   return JSON.parse(data).authors;
 }
 
-// JSON faylga foydalanuvchi ma'lumotlarini yozish
-function saveUsers(authors) {
+// JSON faylga author ma'lumotlarini yozish
+function saveAuthors(authors) {
   fs.writeFileSync("./authors.json", JSON.stringify({ authors }, null, 2));
 }
 
@@ -33,38 +44,35 @@ function createSlug(title) {
     .replace(/[^a-z0-9\-]/g, "");
 }
 
-// Register endpoint
+// Register endpoint (foydalanuvchilarni 'users.json'ga saqlash)
 app.post("/register", (req, res) => {
   const { username, email, password } = req.body;
-  const authors = getAuthors();
+  const users = getUsers();
 
-  // Email allaqachon mavjudligini tekshirish
-  if (authors.some((user) => user.email === email)) {
+  if (users.some((user) => user.email === email)) {
     return res.status(400).json({ message: "Email already exists" });
   }
 
-  // Parolni hashing qilish
   const hashedPassword = bcrypt.hashSync(password, 10);
-
   const newUser = {
-    id: authors.length + 1,
+    id: users.length + 1,
     username,
     email,
     password: hashedPassword,
   };
 
-  authors.push(newUser);
-  saveUsers(authors);
+  users.push(newUser);
+  saveUsers(users);
 
   res.status(201).json({ message: "User registered successfully" });
 });
 
-// Login endpoint
+// Login endpoint (foydalanuvchilarni autentifikatsiya qilish)
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const authors = getAuthors();
+  const users = getUsers();
 
-  const user = authors.find((user) => user.email === email);
+  const user = users.find((user) => user.email === email);
   if (!user) {
     return res.status(400).json({ message: "Invalid email or password" });
   }
@@ -81,7 +89,7 @@ app.post("/login", (req, res) => {
   res.status(200).json({ message: "Logged in successfully", token });
 });
 
-// Middleware for protected routes (only for creating posts)
+// Middleware for protected routes (only for authenticated users)
 function authenticateToken(req, res, next) {
   const token = req.headers["authorization"];
   if (!token) return res.sendStatus(401);
@@ -93,16 +101,26 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// JSON fayldan post ma'lumotlarini olish
-function getPosts() {
-  const data = fs.readFileSync("./posts.json");
-  return JSON.parse(data).posts;
-}
+// Foydalanuvchidan profil ma'lumotlarini olish (ismini va ishini so'rash)
+app.post("/profile", authenticateToken, (req, res) => {
+  const { name, job } = req.body;
+  const authors = getAuthors();
 
-// JSON faylga post ma'lumotlarini yozish
-function savePosts(posts) {
-  fs.writeFileSync("./posts.json", JSON.stringify({ posts }, null, 2));
-}
+  // Foydalanuvchini authors.json fayliga qo'shish
+  const newAuthor = {
+    id: authors.length + 1,
+    userId: req.user.id,
+    name,
+    job,
+  };
+
+  authors.push(newAuthor);
+  saveAuthors(authors);
+
+  res
+    .status(201)
+    .json({ message: "Profile updated successfully", author: newAuthor });
+});
 
 // Public route: Get posts (accessible by everyone)
 app.get("/posts", (req, res) => {
@@ -118,22 +136,19 @@ app.get("/authors", (req, res) => {
 
 // Protected route: Create post (only for authenticated users)
 app.post("/posts", authenticateToken, (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, image, excerpt } = req.body;
   const posts = getPosts();
-
-  // Yangi post uchun slug title dan yaratiladi
   const slug = createSlug(title);
 
-  // Yangi post yaratish
   const newPost = {
     id: posts.length + 1,
     title,
+    slug,
+    content,
     image,
     excerpt,
-    slug, // Slug backend tomonidan yaratiladi
-    content,
     authorId: req.user.id,
-    createdAt: new Date().setFullYear(),
+    createdAt: new Date().toISOString(),
   };
 
   posts.push(newPost);
