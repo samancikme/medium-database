@@ -25,6 +25,17 @@ function saveUsers(authors) {
   fs.writeFileSync("./authors.json", JSON.stringify({ authors }, null, 2));
 }
 
+// JSON fayldan post ma'lumotlarini olish
+function getPosts() {
+  const data = fs.readFileSync("./posts.json");
+  return JSON.parse(data).posts;
+}
+
+// JSON faylga post ma'lumotlarini yozish
+function savePosts(posts) {
+  fs.writeFileSync("./posts.json", JSON.stringify({ posts }, null, 2));
+}
+
 // Register endpoint
 app.post("/register", (req, res) => {
   const { username, email, password } = req.body;
@@ -85,16 +96,32 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// JSON fayldan student ma'lumotlarini olish
-function getPosts() {
-  const data = fs.readFileSync("./posts.json");
-  return JSON.parse(data).posts
-}
-
 // Get posts endpoint (protected)
 app.get("/posts", authenticateToken, (req, res) => {
   const posts = getPosts();
   res.json(posts);
+});
+
+// Create post endpoint (protected)
+app.post("/posts", authenticateToken, (req, res) => {
+  const { title, content } = req.body;
+  const posts = getPosts();
+
+  // Yangi post yaratish
+  const newPost = {
+    id: posts.length + 1,
+    title,
+    content,
+    excerpt,
+    image,
+    authorId: req.user.id,  // Muallif foydalanuvchi IDsi bo'yicha belgilanadi
+    createdAt: new Date().toISOString(),
+  };
+
+  posts.push(newPost);
+  savePosts(posts);
+
+  res.status(201).json({ message: "Post created successfully", post: newPost });
 });
 
 // Get users endpoint (protected)
