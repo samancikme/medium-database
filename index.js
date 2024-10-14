@@ -120,14 +120,13 @@ function authenticateToken(req, res, next) {
 }
 
 // Foydalanuvchidan profil ma'lumotlarini olish (ismini va ishini so'rash)
-app.post("/profile",  (req, res) => {
+app.post("/profile", (req, res) => {
   const { fullName, job, image, regDate, age } = req.body;
   const authors = getAuthors();
 
   // Foydalanuvchini authors.json fayliga qo'shish
   const newAuthor = {
     id: authors.length + 1,
-    userId: req.user.id,
     fullName,
     regDate,
     image,
