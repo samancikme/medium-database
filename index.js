@@ -119,10 +119,16 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Foydalanuvchidan profil ma'lumotlarini olish (ismini va ishini so'rash)
-app.post("/profile", (req, res) => {
+// Profil yaratish faqat login qilgandan keyin bir martta amalga oshiriladi
+app.post("/profile", authenticateToken, (req, res) => {
   const { fullName, job, image, regDate, age } = req.body;
   const authors = getAuthors();
+
+  // Tekshirish: Foydalanuvchi allaqachon profil yaratganmi?
+  const existingAuthor = authors.find((author) => author.userId === req.user.id);
+  if (existingAuthor) {
+    return res.status(400).json({ message: "Siz allaqachon profil yaratgansiz" });
+  }
 
   // Foydalanuvchini authors.json fayliga qo'shish
   const newAuthor = {
@@ -132,6 +138,7 @@ app.post("/profile", (req, res) => {
     image,
     job,
     age,
+    userId: req.user.id, // Profilni user bilan bog'lash uchun
   };
 
   authors.push(newAuthor);
@@ -139,8 +146,9 @@ app.post("/profile", (req, res) => {
 
   res
     .status(201)
-    .json({ message: "Profil muvaffaqiyatli yangilandi", author: newAuthor });
+    .json({ message: "Profil muvaffaqiyatli yaratildi", author: newAuthor });
 });
+
 
 // Public route: Get posts (hamma uchun ochiq)
 app.get("/posts", (req, res) => {
