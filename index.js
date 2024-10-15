@@ -121,7 +121,7 @@ function authenticateToken(req, res, next) {
 
 // Profil yaratish faqat login qilgandan keyin bir martta amalga oshiriladi
 app.post("/profile", authenticateToken, (req, res) => {
-  const { fullName, job, image, regDate, age } = req.body;
+  const { fullName, job, avatar, regDate, age } = req.body;
   const authors = getAuthors();
 
   // Tekshirish: Foydalanuvchi allaqachon profil yaratganmi?
@@ -135,7 +135,7 @@ app.post("/profile", authenticateToken, (req, res) => {
     id: authors.length + 1,
     fullName,
     regDate,
-    image,
+    avatar,
     job,
     age,
     userId: req.user.id, // Profilni user bilan bog'lash uchun
