@@ -202,3 +202,45 @@ app.get("/profile", authenticateToken, (req, res) => {
 app.listen(port, () => {
   console.log(`Server ${port} portda ishlamoqda`);
 });
+
+
+// Profilni o'chirish (faqat autentifikatsiyadan o'tgan foydalanuvchilar uchun)
+app.delete("/profile", authenticateToken, (req, res) => {
+  let authors = getAuthors();
+  
+  // Foydalanuvchining profilini topish
+  const authorIndex = authors.findIndex((author) => author.userId === req.user.id);
+
+  // Agar profil topilmasa, xato xabarini qaytarish
+  if (authorIndex === -1) {
+    return res.status(404).json({ message: "Profil topilmadi" });
+  }
+
+  // Profilni o'chirish
+  authors.splice(authorIndex, 1);
+  saveAuthors(authors);
+
+  res.status(200).json({ message: "Profil muvaffaqiyatli o'chirildi" });
+});
+
+
+
+// Postni o'chirish (faqat o'zining yaratilgan postini o'chira oladi)
+app.delete("/posts/:id", authenticateToken, (req, res) => {
+  let posts = getPosts();
+  const postId = parseInt(req.params.id);
+
+  // O'z postini topish
+  const postIndex = posts.findIndex((post) => post.id === postId && post.authorId === req.user.id);
+
+  // Agar post topilmasa yoki post boshqa foydalanuvchiga tegishli bo'lsa
+  if (postIndex === -1) {
+    return res.status(404).json({ message: "Post topilmadi yoki sizning post emas" });
+  }
+
+  // Postni o'chirish
+  posts.splice(postIndex, 1);
+  savePosts(posts);
+
+  res.status(200).json({ message: "Post muvaffaqiyatli o'chirildi" });
+});
