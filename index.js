@@ -125,9 +125,13 @@ app.post("/profile", authenticateToken, (req, res) => {
   const authors = getAuthors();
 
   // Tekshirish: Foydalanuvchi allaqachon profil yaratganmi?
-  const existingAuthor = authors.find((author) => author.userId === req.user.id);
+  const existingAuthor = authors.find(
+    (author) => author.userId === req.user.id
+  );
   if (existingAuthor) {
-    return res.status(400).json({ message: "Siz allaqachon profil yaratgansiz" });
+    return res
+      .status(400)
+      .json({ message: "Siz allaqachon profil yaratgansiz" });
   }
 
   // Foydalanuvchini authors.json fayliga qo'shish
@@ -149,7 +153,6 @@ app.post("/profile", authenticateToken, (req, res) => {
     .json({ message: "Profil muvaffaqiyatli yaratildi", author: newAuthor });
 });
 
-
 // Public route: Get posts (hamma uchun ochiq)
 app.get("/posts", (req, res) => {
   const posts = getPosts();
@@ -167,6 +170,12 @@ app.post("/posts", authenticateToken, (req, res) => {
   const { title, content, image, excerpt } = req.body;
   const posts = getPosts();
   const slug = createSlug(title);
+  const today = new Date();
+  const formattedDate = today
+    .toLocaleDateString("en-GB") // Sanani formatlash (kun/oy/yil)
+    .split("/") // Sanani qismlarga bo'lib olish
+    .reverse() // O'zgartirilgan sanani teskari tartibda olish
+    .join("-");
 
   const newPost = {
     id: posts.length + 1,
@@ -176,7 +185,7 @@ app.post("/posts", authenticateToken, (req, res) => {
     image,
     excerpt,
     authorId: req.user.id,
-    createdAt: new Date().setFullYear(),
+    createdAt: formattedDate,
   };
 
   posts.push(newPost);
@@ -203,13 +212,14 @@ app.listen(port, () => {
   console.log(`Server ${port} portda ishlamoqda`);
 });
 
-
 // Profilni o'chirish (faqat autentifikatsiyadan o'tgan foydalanuvchilar uchun)
 app.delete("/profile", authenticateToken, (req, res) => {
   let authors = getAuthors();
-  
+
   // Foydalanuvchining profilini topish
-  const authorIndex = authors.findIndex((author) => author.userId === req.user.id);
+  const authorIndex = authors.findIndex(
+    (author) => author.userId === req.user.id
+  );
 
   // Agar profil topilmasa, xato xabarini qaytarish
   if (authorIndex === -1) {
@@ -223,19 +233,21 @@ app.delete("/profile", authenticateToken, (req, res) => {
   res.status(200).json({ message: "Profil muvaffaqiyatli o'chirildi" });
 });
 
-
-
 // Postni o'chirish (faqat o'zining yaratilgan postini o'chira oladi)
 app.delete("/posts/:id", authenticateToken, (req, res) => {
   let posts = getPosts();
   const postId = parseInt(req.params.id);
 
   // O'z postini topish
-  const postIndex = posts.findIndex((post) => post.id === postId && post.authorId === req.user.id);
+  const postIndex = posts.findIndex(
+    (post) => post.id === postId && post.authorId === req.user.id
+  );
 
   // Agar post topilmasa yoki post boshqa foydalanuvchiga tegishli bo'lsa
   if (postIndex === -1) {
-    return res.status(404).json({ message: "Post topilmadi yoki sizning post emas" });
+    return res
+      .status(404)
+      .json({ message: "Post topilmadi yoki sizning post emas" });
   }
 
   // Postni o'chirish
